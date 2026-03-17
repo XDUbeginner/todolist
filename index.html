@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项管理工具</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 待办事项管理工具</h1>
+            <div class="header-actions">
+                <button onclick="showAddModal()">➕ 添加事项</button>
+                <button onclick="showTagManager()">🏷️ 管理标签</button>
+                <button onclick="generateDailySummary()">📊 每日总结</button>
+                <select id="viewMode" onchange="changeViewMode()">
+                    <option value="day">📅 今日视图</option>
+                    <option value="week">📆 本周视图</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="filter-section">
+            <h3>筛选选项</h3>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="assigneeFilter">责任人：</label>
+                    <select id="assigneeFilter" onchange="applyFilters()">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="ddlFilter">DDL：</label>
+                    <select id="ddlFilter" onchange="applyFilters()">
+                        <option value="">全部</option>
+                        <option value="overdue">已过期</option>
+                        <option value="today">今天</option>
+                        <option value="week">本周</option>
+                        <option value="future">未来</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="tagFilter">标签：</label>
+                    <select id="tagFilter" onchange="applyFilters()">
+                        <option value="">全部</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilter">状态：</label>
+                    <select id="statusFilter" onchange="applyFilters()">
+                        <option value="">全部</option>
+                        <option value="pending">待处理</option>
+                        <option value="in-progress">进行中</option>
+                        <option value="completed">已完成</option>
+                        <option value="blocked">阻塞中</option>
+                    </select>
+                </div>
+                <button onclick="clearFilters()">清除筛选</button>
+            </div>
+        </div>
+
+        <main>
+            <section class="todo-list-section">
+                <h2>待办事项列表</h2>
+                <div id="todoList" class="todo-list">
+                    <!-- 待办事项将在这里动态生成 -->
+                </div>
+            </section>
+
+            <section class="summary-section" id="summarySection" style="display: none;">
+                <h2>每日总结 <button onclick="todoManager.toggleSummary()" class="close-summary">✕</button></h2>
+                <div id="dailySummary" class="daily-summary">
+                    <!-- 每日总结将在这里生成 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 添加/编辑事项模态框 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">添加事项</h2>
+            <form id="todoForm">
+                <input type="hidden" id="itemId">
+
+                <div class="form-group">
+                    <label for="content">事项内容 *</label>
+                    <input type="text" id="content" placeholder="请输入事项内容" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ddl">期待DDL *</label>
+                    <input type="datetime-local" id="ddl" required>
+                </div>
+
+                <div class="form-group">
+                    <label>标签</label>
+                    <div class="tag-selection">
+                        <div id="tagCheckboxes" class="tag-checkboxes">
+                            <!-- 动态加载标签复选框 -->
+                        </div>
+                        <input type="text" id="newTag" placeholder="输入新标签，按回车添加">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>前置条件</label>
+                    <div id="prerequisitesList">
+                        <!-- 前置条件列表 -->
+                    </div>
+                    <div class="prerequisite-input">
+                        <input type="text" id="newPrerequisite" placeholder="添加前置条件">
+                        <button type="button" onclick="addPrerequisite()">添加</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="creator">事项提出人</label>
+                    <input type="text" id="creator" placeholder="请输入提出人姓名">
+                </div>
+
+                <div class="form-group">
+                    <label for="assignee">事项责任人</label>
+                    <input type="text" id="assignee" placeholder="请输入责任人姓名">
+                </div>
+
+                <div class="form-group">
+                    <label for="dependencies">事项依赖</label>
+                    <select id="dependencies" multiple>
+                        <!-- 动态加载未完成事项 -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="progressText">进展描述</label>
+                    <textarea id="progressText" rows="2" placeholder="描述事项的当前进展..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">备注</label>
+                    <textarea id="notes" rows="3" placeholder="添加备注信息..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="status">状态</label>
+                    <select id="status">
+                        <option value="pending">⏳ 待处理</option>
+                        <option value="in-progress">🔄 进行中</option>
+                        <option value="completed">✅ 已完成</option>
+                    </select>
+                </div>
+
+                <button type="submit">💾 保存</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 标签管理模态框 -->
+    <div id="tagModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTagModal()">&times;</span>
+            <h2>🏷️ 标签管理</h2>
+            <div class="tag-manager">
+                <div class="tag-input-section">
+                    <input type="text" id="tagInput" placeholder="输入新标签名称">
+                    <button onclick="addNewTag()">添加标签</button>
+                </div>
+                <div id="tagList" class="tag-list">
+                    <!-- 标签列表将在这里动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
