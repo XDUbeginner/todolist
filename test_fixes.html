@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug修复测试</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e1e8ed;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        .test-case h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .test-case button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        .test-case button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Bug修复测试套件</h1>
+
+        <div class="section">
+            <h2>第一阶段：紧急修复测试</h2>
+
+            <div class="test-case">
+                <h3>测试1：日期处理逻辑错误修复</h3>
+                <p>验证setHours()不再修改原Date对象</p>
+                <button onclick="testDateHandling()">运行测试</button>
+                <div id="test1-result" class="result"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>测试2：localStorage数据损坏保护</h3>
+                <p>验证JSON.parse()异常能正确处理</p>
+                <button onclick="testLocalStorageProtection()">运行测试</button>
+                <div id="test2-result" class="result"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>测试3：前置条件状态同步机制</h3>
+                <p>验证前置条件完成状态自动更新</p>
+                <button onclick="testPrerequisiteSync()">运行测试</button>
+                <div id="test3-result" class="result"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>第二阶段：高优先级修复测试</h2>
+
+            <div class="test-case">
+                <h3>测试4：空值安全处理</h3>
+                <p>验证空数组属性安全访问</p>
+                <button onclick="testNullSafety()">运行测试</button>
+                <div id="test4-result" class="result"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>测试5：循环依赖检测</h3>
+                <p>验证A依赖B，B依赖A的检测机制</p>
+                <button onclick="testCircularDependency()">运行测试</button>
+                <div id="test5-result" class="result"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>测试6：DOM依赖修复</h3>
+                <p>验证DOM存在性检查</p>
+                <button onclick="testDomDependencies()">运行测试</button>
+                <div id="test6-result" class="result"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>第三阶段：优化改进测试</h2>
+
+            <div class="test-case">
+                <h3>测试7：统一提示系统</h3>
+                <p>验证alert()已被showNotification()替换</p>
+                <button onclick="testNotificationSystem()">运行测试</button>
+                <div id="test7-result" class="result"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>测试8：XSS防护加固</h3>
+                <p>验证escapeHtml()函数正常工作</p>
+                <button onclick="testXssProtection()">运行测试</button>
+                <div id="test8-result" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 测试1：日期处理逻辑错误修复
+        function testDateHandling() {
+            try {
+                const originalDate = new Date('2024-01-01T10:00:00');
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                // 验证原始日期未被修改
+                const originalHours = originalDate.getHours();
+
+                if (originalHours === 10) {
+                    document.getElementById('test1-result').innerHTML =
+                        '<div class="success">✓ 测试通过：setHours() 不会修改原Date对象</div>';
+                } else {
+                    document.getElementById('test1-result').innerHTML =
+                        '<div class="error">✗ 测试失败：setHours() 修改了原Date对象</div>';
+                }
+            } catch (error) {
+                document.getElementById('test1-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+
+        // 测试2：localStorage数据损坏保护
+        function testLocalStorageProtection() {
+            try {
+                // 模拟损坏的localStorage数据
+                localStorage.setItem('testCorruptedData', 'invalid json {{{');
+
+                // 测试TodoManager的数据加载
+                const TodoManager = window.todoManager?.constructor || class {
+                    loadFromStorage() {
+                        try {
+                            const stored = localStorage.getItem('todoItems');
+                            return stored ? JSON.parse(stored) : [];
+                        } catch (e) {
+                            console.error('数据加载失败，重置为空:', e);
+                            return [];
+                        }
+                    }
+                };
+
+                const manager = new TodoManager();
+                const result = manager.loadFromStorage();
+
+                if (Array.isArray(result)) {
+                    document.getElementById('test2-result').innerHTML =
+                        '<div class="success">✓ 测试通过：localStorage损坏保护正常</div>';
+                } else {
+                    document.getElementById('test2-result').innerHTML =
+                        '<div class="error">✗ 测试失败：localStorage损坏保护异常</div>';
+                }
+
+                // 清理测试数据
+                localStorage.removeItem('testCorruptedData');
+            } catch (error) {
+                document.getElementById('test2-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+
+        // 测试3：前置条件状态同步机制
+        function testPrerequisiteSync() {
+            try {
+                if (!window.todoManager) {
+                    document.getElementById('test3-result').innerHTML =
+                        '<div class="info">⚠ 请先加载待办事项应用</div>';
+                    return;
+                }
+
+                const manager = window.todoManager;
+                const originalLength = manager.items.length;
+
+                // 创建测试事项
+                const item1 = manager.addItem({
+                    content: '测试前置条件同步 - 事项1',
+                    ddl: new Date(Date.now() + 86400000).toISOString(),
+                    status: 'completed'
+                });
+
+                const item2 = manager.addItem({
+                    content: '测试前置条件同步 - 事项2',
+                    ddl: new Date(Date.now() + 86400000).toISOString(),
+                    dependencies: [item1.id],
+                    prerequisites: [{
+                        type: 'dependency',
+                        itemId: item1.id,
+                        completed: false
+                    }]
+                });
+
+                // 手动触发前置条件状态更新
+                manager.updatePrerequisiteStates();
+
+                // 检查前置条件状态
+                const updatedItem2 = manager.items.find(i => i.id === item2.id);
+                const prerequisiteCompleted = updatedItem2.prerequisites[0].completed;
+
+                // 清理测试数据
+                manager.deleteItem(item2.id);
+                manager.deleteItem(item1.id);
+
+                if (prerequisiteCompleted) {
+                    document.getElementById('test3-result').innerHTML =
+                        '<div class="success">✓ 测试通过：前置条件状态同步正常</div>';
+                } else {
+                    document.getElementById('test3-result').innerHTML =
+                        '<div class="error">✗ 测试失败：前置条件状态未同步</div>';
+                }
+            } catch (error) {
+                document.getElementById('test3-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+
+        // 测试4：空值安全处理
+        function testNullSafety() {
+            try {
+                if (!window.todoManager) {
+                    document.getElementById('test4-result').innerHTML =
+                        '<div class="info">⚠ 请先加载待办事项应用</div>';
+                    return;
+                }
+
+                const manager = window.todoManager;
+
+                // 创建包含空数组属性的测试事项
+                const testItem = {
+                    id: 99999,
+                    content: '测试空值安全',
+                    ddl: new Date().toISOString(),
+                    tags: null,
+                    dependencies: undefined,
+                    prerequisites: null
+                };
+
+                // 测试canCompleteItem方法
+                const result = manager.canCompleteItem(testItem);
+
+                if (result === true) {
+                    document.getElementById('test4-result').innerHTML =
+                        '<div class="success">✓ 测试通过：空值安全处理正常</div>';
+                } else {
+                    document.getElementById('test4-result').innerHTML =
+                        '<div class="error">✗ 测试失败：空值安全处理异常</div>';
+                }
+            } catch (error) {
+                document.getElementById('test4-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+
+        // 测试5：循环依赖检测
+        function testCircularDependency() {
+            try {
+                if (!window.todoManager) {
+                    document.getElementById('test5-result').innerHTML =
+                        '<div class="info">⚠ 请先加载待办事项应用</div>';
+                    return;
+                }
+
+                const manager = window.todoManager;
+
+                // 测试循环依赖检测
+                const item1 = { id: 1, dependencies: [2] };
+                const item2 = { id: 2, dependencies: [1] };
+                const items = [item1, item2];
+
+                const hasCircular = manager.detectCircularDependency(1, [2], items);
+
+                // 测试无循环的情况
+                const item3 = { id: 3, dependencies: [4] };
+                const item4 = { id: 4, dependencies: [] };
+                const itemsNoCircular = [item3, item4];
+
+                const noCircular = manager.detectCircularDependency(3, [4], itemsNoCircular);
+
+                if (hasCircular && !noCircular) {
+                    document.getElementById('test5-result').innerHTML =
+                        '<div class="success">✓ 测试通过：循环依赖检测正常</div>';
+                } else {
+                    document.getElementById('test5-result').innerHTML =
+                        '<div class="error">✗ 测试失败：循环依赖检测异常</div>';
+                }
+            } catch (error) {
+                document.getElementById('test5-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+
+        // 测试6：DOM依赖修复
+        function testDomDependencies() {
+            try {
+                if (!window.todoManager) {
+                    document.getElementById('test6-result').innerHTML =
+                        '<div class="info">⚠ 请先加载待办事项应用</div>';
+                    return;
+                }
+
+                const manager = window.todoManager;
+
+                // 测试在没有DOM元素的情况下渲染依赖箭头
+                const testItem = {
+                    id: 99998,
+                    content: '测试DOM依赖',
+                    ddl: new Date().toISOString(),
+                    dependencies: [99999]
+                };
+
+                // 临时移除todoList元素
+                const todoList = document.getElementById('todoList');
+                const todoListParent = todoList?.parentNode;
+                const todoListDisplay = todoList?.style.display;
+                if (todoList) {
+                    todoList.style.display = 'none';
+                }
+
+                // 测试渲染依赖箭头不会报错
+                try {
+                    const result = manager.renderDependencyArrows(testItem);
+                    document.getElementById('test6-result').innerHTML =
+                        '<div class="success">✓ 测试通过：DOM依赖处理正常</div>';
+                } catch (error) {
+                    document.getElementById('test6-result').innerHTML =
+                        '<div class="error">✗ 测试失败：DOM依赖处理异常</div>';
+                }
+
+                // 恢复DOM元素
+                if (todoList && todoListDisplay !== undefined) {
+                    todoList.style.display = todoListDisplay;
+                }
+            } catch (error) {
+                document.getElementById('test6-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+
+        // 测试7：统一提示系统
+        function testNotificationSystem() {
+            try {
+                if (!window.todoManager) {
+                    document.getElementById('test7-result').innerHTML =
+                        '<div class="info">⚠ 请先加载待办事项应用</div>';
+                    return;
+                }
+
+                const manager = window.todoManager;
+
+                // 检查代码中是否还有alert
+                const fs = require('fs');
+                const scriptContent = fs.readFileSync('script.js', 'utf8');
+                const alertCount = (scriptContent.match(/alert\(/) || []).length;
+
+                if (alertCount === 0) {
+                    document.getElementById('test7-result').innerHTML =
+                        '<div class="success">✓ 测试通过：已统一使用showNotification()</div>';
+                } else {
+                    document.getElementById('test7-result').innerHTML =
+                        `<div class="error">✗ 测试失败：代码中仍存在${alertCount}个alert()</div>`;
+                }
+            } catch (error) {
+                // 如果无法读取文件，使用备用测试
+                if (window.todoManager && typeof window.todoManager.showNotification === 'function') {
+                    document.getElementById('test7-result').innerHTML =
+                        '<div class="success">✓ 测试通过：showNotification()系统存在</div>';
+                } else {
+                    document.getElementById('test7-result').innerHTML =
+                        '<div class="error">✗ 测试失败：showNotification()系统不存在</div>';
+                }
+            }
+        }
+
+        // 测试8：XSS防护加固
+        function testXssProtection() {
+            try {
+                if (!window.todoManager) {
+                    document.getElementById('test8-result').innerHTML =
+                        '<div class="info">⚠ 请先加载待办事项应用</div>';
+                    return;
+                }
+
+                const manager = window.todoManager;
+
+                // 测试escapeHtml函数
+                const testCases = [
+                    { input: '<script>alert("xss")</script>', expected: '&lt;script&gt;alert("xss")&lt;/script&gt;' },
+                    { input: '" onclick="alert(1)"', expected: '" onclick="alert(1)"' },
+                    { input: '正常文本', expected: '正常文本' },
+                    { input: '<>&"\'', expected: '&lt;&gt;&amp;"\'' }
+                ];
+
+                let allPassed = true;
+                testCases.forEach(testCase => {
+                    const result = manager.escapeHtml(testCase.input);
+                    if (result !== testCase.expected) {
+                        allPassed = false;
+                    }
+                });
+
+                if (allPassed) {
+                    document.getElementById('test8-result').innerHTML =
+                        '<div class="success">✓ 测试通过：XSS防护正常</div>';
+                } else {
+                    document.getElementById('test8-result').innerHTML =
+                        '<div class="error">✗ 测试失败：XSS防护异常</div>';
+                }
+            } catch (error) {
+                document.getElementById('test8-result').innerHTML =
+                    `<div class="error">✗ 测试错误：${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

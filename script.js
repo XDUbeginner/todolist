@@ -13,8 +13,13 @@ class TodoManager {
     }
 
     loadFromStorage() {
-        const stored = localStorage.getItem('todoItems');
-        return stored ? JSON.parse(stored) : [];
+        try {
+            const stored = localStorage.getItem('todoItems');
+            return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            console.error('数据加载失败，重置为空:', e);
+            return [];
+        }
     }
 
     saveToStorage() {
@@ -22,17 +27,31 @@ class TodoManager {
     }
 
     loadTagsFromStorage() {
-        const stored = localStorage.getItem('todoTags');
-        return stored ? JSON.parse(stored) : [
-            { id: 1, name: '高优先级', color: 'high-priority' },
-            { id: 2, name: '中优先级', color: 'medium-priority' },
-            { id: 3, name: '低优先级', color: 'low-priority' },
-            { id: 4, name: '紧急', color: 'urgent' },
-            { id: 5, name: '版本1.0', color: 'version' },
-            { id: 6, name: '版本2.0', color: 'version' },
-            { id: 7, name: '工作', color: 'work' },
-            { id: 8, name: '个人', color: 'personal' }
-        ];
+        try {
+            const stored = localStorage.getItem('todoTags');
+            return stored ? JSON.parse(stored) : [
+                { id: 1, name: '高优先级', color: 'high-priority' },
+                { id: 2, name: '中优先级', color: 'medium-priority' },
+                { id: 3, name: '低优先级', color: 'low-priority' },
+                { id: 4, name: '紧急', color: 'urgent' },
+                { id: 5, name: '版本1.0', color: 'version' },
+                { id: 6, name: '版本2.0', color: 'version' },
+                { id: 7, name: '工作', color: 'work' },
+                { id: 8, name: '个人', color: 'personal' }
+            ];
+        } catch (e) {
+            console.error('标签加载失败，重置为默认:', e);
+            return [
+                { id: 1, name: '高优先级', color: 'high-priority' },
+                { id: 2, name: '中优先级', color: 'medium-priority' },
+                { id: 3, name: '低优先级', color: 'low-priority' },
+                { id: 4, name: '紧急', color: 'urgent' },
+                { id: 5, name: '版本1.0', color: 'version' },
+                { id: 6, name: '版本2.0', color: 'version' },
+                { id: 7, name: '工作', color: 'work' },
+                { id: 8, name: '个人', color: 'personal' }
+            ];
+        }
     }
 
     saveTagsToStorage() {
@@ -40,39 +59,89 @@ class TodoManager {
     }
 
     addItem(itemData) {
-        const prerequisites = itemData.prerequisites || [];
-        prerequisites.forEach(prereq => {
-            if (prereq.type === 'dependency' && prereq.itemId) {
-                prereq.completed = this.items.find(item => item.id === prereq.itemId)?.status === 'completed';
+        try {
+            // 验证必填字段
+            if (!itemData.content || itemData.content.trim().length === 0) {
+                throw new Error('事项内容不能为空');
             }
-        });
+            if (!itemData.ddl) {
+                throw new Error('DDL不能为空');
+            }
 
-        const newItem = {
-            id: this.currentId++,
-            content: itemData.content,
-            ddl: itemData.ddl,
-            tags: itemData.tags || [],
-            creator: itemData.creator || '',
-            assignee: itemData.assignee || '',
-            dependencies: itemData.dependencies || [],
-            notes: itemData.notes || '',
-            progressText: itemData.progressText || '',
-            prerequisites: prerequisites,
-            status: itemData.status || 'pending',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            completedAt: null
-        };
+            // 验证DDL格式
+            const ddlDate = new Date(itemData.ddl);
+            if (isNaN(ddlDate.getTime())) {
+                throw new Error('DDL格式不正确，请使用正确的日期时间格式');
+            }
 
-        this.items.push(newItem);
-        this.saveToStorage();
-        this.renderTodoList();
-        return newItem;
+            // 验证DDL不是过去时间（可选，根据需求调整）
+            const now = new Date();
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            if (ddlDate < todayStart) {
+                console.warn('警告：DDL设置为过去时间');
+            }
+
+            // 验证循环依赖
+            const dependencies = itemData.dependencies || [];
+            if (this.detectCircularDependency(this.currentId, dependencies)) {
+                throw new Error('检测到循环依赖，无法添加此事项');
+            }
+
+            const prerequisites = itemData.prerequisites || [];
+            prerequisites.forEach(prereq => {
+                if (prereq.type === 'dependency' && prereq.itemId) {
+                    prereq.completed = this.items.find(item => item.id === prereq.itemId)?.status === 'completed';
+                }
+            });
+
+            const newItem = {
+                id: this.currentId++,
+                content: itemData.content.trim(),
+                ddl: itemData.ddl,
+                tags: itemData.tags || [],
+                creator: itemData.creator || '',
+                assignee: itemData.assignee || '',
+                dependencies: itemData.dependencies || [],
+                notes: itemData.notes || '',
+                progressText: itemData.progressText || '',
+                prerequisites: prerequisites,
+                status: itemData.status || 'pending',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                completedAt: null
+            };
+
+            this.items.push(newItem);
+            this.saveToStorage();
+            this.renderTodoList();
+            this.showNotification('事项添加成功！', 'success');
+            return newItem;
+        } catch (error) {
+            this.showNotification(`添加事项失败：${error.message}`, 'error');
+            console.error('添加事项错误:', error);
+            throw error;
+        }
     }
 
     updateItem(id, updates) {
-        const item = this.items.find(item => item.id === id);
-        if (item) {
+        try {
+            const item = this.items.find(item => item.id === id);
+            if (!item) {
+                throw new Error(`找不到ID为 ${id} 的事项`);
+            }
+
+            // 验证更新数据
+            if (updates.content !== undefined && (!updates.content || updates.content.trim().length === 0)) {
+                throw new Error('事项内容不能为空');
+            }
+            if (updates.ddl !== undefined) {
+                const ddlDate = new Date(updates.ddl);
+                if (isNaN(ddlDate.getTime())) {
+                    throw new Error('DDL格式不正确');
+                }
+            }
+
             // 处理前置条件状态
             if (updates.prerequisites) {
                 updates.prerequisites.forEach(prereq => {
@@ -89,20 +158,58 @@ class TodoManager {
             }
             this.saveToStorage();
             this.renderTodoList();
+            this.updatePrerequisiteStates(); // Update prerequisite states after changes
+            this.showNotification('事项更新成功！', 'success');
+        } catch (error) {
+            this.showNotification(`更新事项失败：${error.message}`, 'error');
+            console.error('更新事项错误:', error);
+            throw error;
         }
     }
 
     deleteItem(id) {
-        this.items = this.items.filter(item => item.id !== id);
-        this.saveToStorage();
-        this.renderTodoList();
+        try {
+            const itemIndex = this.items.findIndex(item => item.id === id);
+            if (itemIndex === -1) {
+                throw new Error(`找不到ID为 ${id} 的事项`);
+            }
+
+            const item = this.items[itemIndex];
+            const confirmMessage = `确定要删除事项 "${item.content}" 吗？`;
+
+            if (confirm(confirmMessage)) {
+                this.items = this.items.filter(item => item.id !== id);
+                this.saveToStorage();
+                this.renderTodoList();
+                this.showNotification('事项已删除', 'success');
+            }
+        } catch (error) {
+            this.showNotification(`删除事项失败：${error.message}`, 'error');
+            console.error('删除事项错误:', error);
+        }
     }
 
     toggleComplete(id) {
-        const item = this.items.find(item => item.id === id);
-        if (item) {
+        try {
+            const item = this.items.find(item => item.id === id);
+            if (!item) {
+                throw new Error(`找不到ID为 ${id} 的事项`);
+            }
+
+            // 检查前置条件
+            if (item.prerequisites && item.prerequisites.length > 0 && item.status !== 'completed') {
+                const canComplete = item.prerequisites.every(prereq => prereq.completed);
+                if (!canComplete) {
+                    this.showNotification('请完成所有前置条件后再完成此事项！', 'warning');
+                    return;
+                }
+            }
+
             const newStatus = item.status === 'completed' ? 'pending' : 'completed';
             this.updateItem(id, { status: newStatus });
+        } catch (error) {
+            this.showNotification(`切换完成状态失败：${error.message}`, 'error');
+            console.error('切换完成状态错误:', error);
         }
     }
 
@@ -110,10 +217,11 @@ class TodoManager {
         const item = this.items.find(item => item.id === id);
         if (item) {
             // 如果有未满足的前置条件，不能直接完成
-            if (item.prerequisites && item.prerequisites.length > 0 && item.status !== 'completed') {
-                const canComplete = item.prerequisites.every(prereq => prereq.completed);
+            const prerequisites = item.prerequisites || [];
+            if (prerequisites.length > 0 && item.status !== 'completed') {
+                const canComplete = prerequisites.every(prereq => prereq.completed);
                 if (!canComplete) {
-                    alert('请完成所有前置条件后再完成此事项！');
+                    this.showNotification('请完成所有前置条件后再完成此事项！', 'warning');
                     return;
                 }
             }
@@ -136,8 +244,9 @@ class TodoManager {
     }
 
     canCompleteItem(item) {
-        if (item.prerequisites && item.prerequisites.length > 0) {
-            return item.prerequisites.every(prereq => prereq.completed);
+        const prerequisites = item.prerequisites || [];
+        if (prerequisites.length > 0) {
+            return prerequisites.every(prereq => prereq.completed);
         }
         return true;
     }
@@ -368,20 +477,36 @@ class TodoManager {
     renderDependencyArrows(item) {
         if (!item.dependencies || item.dependencies.length === 0) return '';
 
+        // 检查是否处于渲染过程中（DOM可能尚未完全就绪）
+        const todoList = document.getElementById('todoList');
+        if (!todoList) return '';
+
         const arrows = item.dependencies.map(depId => {
             const depItem = this.items.find(i => i.id === depId);
             if (!depItem) return '';
-            const depElement = document.querySelector(`[data-id="${depItem.id}"]`);
-            if (!depElement) return '';
-            const depIndex = Array.from(depElement.parentNode.children).indexOf(depElement);
-            const currentElement = document.querySelector(`[data-id="${item.id}"]`);
-            if (!currentElement) return '';
-            const currentIndex = Array.from(currentElement.parentNode.children).indexOf(currentElement);
 
-            if (currentIndex > depIndex) {
-                return `<span class="dependency-arrow">⬇️</span>`;
-            } else {
-                return `<span class="dependency-arrow">⬆️</span>`;
+            try {
+                const depElement = document.querySelector(`[data-id="${depItem.id}"]`);
+                if (!depElement || !depElement.parentNode) return '';
+
+                const currentElement = document.querySelector(`[data-id="${item.id}"]`);
+                if (!currentElement || !currentElement.parentNode) return '';
+
+                const depIndex = Array.from(depElement.parentNode.children).indexOf(depElement);
+                const currentIndex = Array.from(currentElement.parentNode.children).indexOf(currentElement);
+
+                // 只有在两者都在同一列表中时才显示箭头
+                if (depElement.parentNode === currentElement.parentNode) {
+                    if (currentIndex > depIndex) {
+                        return `<span class="dependency-arrow">⬇️</span>`;
+                    } else if (currentIndex < depIndex) {
+                        return `<span class="dependency-arrow">⬆️</span>`;
+                    }
+                }
+                return '';
+            } catch (error) {
+                console.warn('渲染依赖箭头时出错:', error);
+                return '';
             }
         }).filter(arrow => arrow !== '').join('');
 
@@ -658,21 +783,108 @@ class TodoManager {
         return colors[Math.floor(Math.random() * colors.length)];
     }
 
+    // 通知系统
+    showNotification(message, type = 'info', duration = 3000) {
+        // 创建通知容器（如果不存在）
+        let notificationContainer = document.getElementById('notificationContainer');
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notificationContainer';
+            notificationContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                max-width: 400px;
+            `;
+            document.body.appendChild(notificationContainer);
+        }
+
+        // 创建通知元素
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            animation: slideIn 0.3s ease-out;
+            background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'warning' ? '#f39c12' : '#3498db'};
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        notification.textContent = message;
+
+        // 添加动画样式
+        if (!document.getElementById('notificationStyles')) {
+            const style = document.createElement('style');
+            style.id = 'notificationStyles';
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOut {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        notificationContainer.appendChild(notification);
+
+        // 自动移除通知
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notification.remove(), 300);
+        }, duration);
+    }
+
     // 辅助方法
     escapeHtml(text) {
+        if (text === null || text === undefined) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
     formatDateTime(dateTimeString) {
-        const date = new Date(dateTimeString);
-        return date.toLocaleString('zh-CN');
+        try {
+            const date = new Date(dateTimeString);
+            if (isNaN(date.getTime())) {
+                console.warn('无效的日期格式:', dateTimeString);
+                return '无效日期';
+            }
+            return date.toLocaleString('zh-CN');
+        } catch (error) {
+            console.error('格式化日期错误:', error);
+            return '日期错误';
+        }
     }
 
     formatDateTimeForInput(dateTimeString) {
-        const date = new Date(dateTimeString);
-        return date.toISOString().slice(0, 16);
+        try {
+            const date = new Date(dateTimeString);
+            if (isNaN(date.getTime())) {
+                return '';
+            }
+            return date.toISOString().slice(0, 16);
+        } catch (error) {
+            console.error('格式化输入日期错误:', error);
+            return '';
+        }
     }
 
     getStatusText(status) {
@@ -682,6 +894,57 @@ class TodoManager {
             'completed': '已完成'
         };
         return statusMap[status] || status;
+    }
+
+    updatePrerequisiteStates() {
+        // 更新所有事项的前置条件状态
+        this.items.forEach(item => {
+            if (item.prerequisites && item.prerequisites.length > 0) {
+                let hasChanges = false;
+                item.prerequisites.forEach(prereq => {
+                    if (prereq.type === 'dependency' && prereq.itemId) {
+                        const dependencyItem = this.items.find(i => i.id === prereq.itemId);
+                        if (dependencyItem) {
+                            const newCompletedState = dependencyItem.status === 'completed';
+                            if (prereq.completed !== newCompletedState) {
+                                prereq.completed = newCompletedState;
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                });
+                if (hasChanges) {
+                    item.updatedAt = new Date().toISOString();
+                }
+            }
+        });
+        this.saveToStorage();
+        this.renderTodoList();
+    }
+
+    detectCircularDependency(itemId, dependencies, items = null) {
+        const itemsList = items || this.items;
+        const visited = new Set();
+
+        function check(currentId, path = []) {
+            if (visited.has(currentId)) return false; // 已检查过，无循环
+            if (path.includes(currentId)) return true; // 发现循环
+
+            visited.add(currentId);
+            const currentItem = itemsList.find(i => i.id === currentId);
+
+            if (currentItem?.dependencies?.length > 0) {
+                for (const depId of currentItem.dependencies) {
+                    if (check(depId, [...path, currentId])) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        return dependencies.some(depId => check(depId, [itemId]));
     }
 }
 
@@ -797,35 +1060,40 @@ function changeViewMode() {
 document.getElementById('todoForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const itemId = document.getElementById('itemId').value;
-    const currentItem = itemId ? todoManager.items.find(item => item.id === parseInt(itemId)) : null;
+    try {
+        const itemId = document.getElementById('itemId').value;
+        const currentItem = itemId ? todoManager.items.find(item => item.id === parseInt(itemId)) : null;
 
-    // 获取选中的标签
-    const selectedTags = [];
-    document.querySelectorAll('#tagCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
-        selectedTags.push(parseInt(checkbox.value));
-    });
+        // 获取选中的标签
+        const selectedTags = [];
+        document.querySelectorAll('#tagCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
+            selectedTags.push(parseInt(checkbox.value));
+        });
 
-    const formData = {
-        content: document.getElementById('content').value,
-        ddl: document.getElementById('ddl').value,
-        tags: selectedTags,
-        creator: document.getElementById('creator').value,
-        assignee: document.getElementById('assignee').value,
-        dependencies: Array.from(document.getElementById('dependencies').selectedOptions).map(option => parseInt(option.value)),
-        notes: document.getElementById('notes').value,
-        progressText: document.getElementById('progressText').value,
-        prerequisites: currentItem && currentItem.prerequisites ? currentItem.prerequisites : [],
-        status: document.getElementById('status').value
-    };
+        const formData = {
+            content: document.getElementById('content').value,
+            ddl: document.getElementById('ddl').value,
+            tags: selectedTags,
+            creator: document.getElementById('creator').value,
+            assignee: document.getElementById('assignee').value,
+            dependencies: Array.from(document.getElementById('dependencies').selectedOptions).map(option => parseInt(option.value)),
+            notes: document.getElementById('notes').value,
+            progressText: document.getElementById('progressText').value,
+            prerequisites: currentItem && currentItem.prerequisites ? currentItem.prerequisites : [],
+            status: document.getElementById('status').value
+        };
 
-    if (itemId) {
-        todoManager.updateItem(parseInt(itemId), formData);
-    } else {
-        todoManager.addItem(formData);
+        if (itemId) {
+            todoManager.updateItem(parseInt(itemId), formData);
+        } else {
+            todoManager.addItem(formData);
+        }
+
+        closeModal();
+    } catch (error) {
+        console.error('表单提交错误:', error);
+        todoManager.showNotification(`操作失败：${error.message}`, 'error');
     }
-
-    closeModal();
 });
 
 function clearFilters() {
