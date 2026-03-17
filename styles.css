@@ -6,8 +6,8 @@
 
 body {
     font-family: 'Segoe UI', 'Microsoft YaHei', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-    color: #333;
+    background: #0a0a0a;
+    color: #e0e0e0;
     min-height: 100vh;
 }
 
@@ -15,20 +15,20 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    background: #0a0a0a;
 }
 
 header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    background: #1a1a1a;
     padding: 25px;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 15px;
+    border: 1px solid #333;
 }
 
 h1 {
@@ -45,20 +45,20 @@ h1 {
 
 button {
     padding: 12px 24px;
-    border: none;
+    border: 1px solid #444;
     border-radius: 8px;
-    background: linear-gradient(45deg, #ff6b6b, #ff5252);
-    color: white;
+    background: #2a2a2a;
+    color: #e0e0e0;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
 }
 
 button:hover {
+    background: #3a3a3a;
+    border-color: #666;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
 }
 
 select {
@@ -77,11 +77,10 @@ select:focus {
 }
 
 .todo-list-section {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    background: #1a1a1a;
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid #333;
 }
 
 .todo-list-section h2 {
@@ -96,12 +95,11 @@ select:focus {
 }
 
 .todo-item {
-    border: none;
+    border: 1px solid #333;
     border-radius: 12px;
     padding: 20px;
-    background: white;
+    background: #1a1a1a;
     transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
 }
@@ -113,7 +111,7 @@ select:focus {
     left: 0;
     width: 5px;
     height: 100%;
-    background: linear-gradient(to bottom, #3498db, #2980b9);
+    background: #4a90e2;
     transition: width 0.3s;
 }
 
@@ -123,23 +121,23 @@ select:focus {
 
 .todo-item:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #555;
 }
 
 .todo-item.overdue::before {
-    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    background: #e74c3c;
 }
 
 .todo-item.overdue {
-    background: linear-gradient(135deg, #fef5f5 0%, #fde2e2 100%);
+    background: #2a1a1a;
 }
 
 .todo-item.completed {
-    opacity: 0.8;
+    opacity: 0.6;
 }
 
 .todo-item.completed::before {
-    background: linear-gradient(to bottom, #27ae60, #229954);
+    background: #27ae60;
 }
 
 .todo-item-header {
@@ -153,7 +151,7 @@ select:focus {
     font-weight: 600;
     font-size: 18px;
     flex: 1;
-    color: #2c3e50;
+    color: #e0e0e0;
     margin-right: 15px;
 }
 
@@ -213,38 +211,51 @@ select:focus {
     border-radius: 15px;
     font-size: 12px;
     font-weight: 500;
-    background: linear-gradient(45deg, #ffb344, #ff9a3c);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border: 1px solid #444;
 }
 
 .tag.high-priority {
-    background: linear-gradient(45deg, #ff6b6b, #ff5252);
+    background: #2a1a1a;
+    border-color: #8b0000;
+    color: #ff6b6b;
 }
 
 .tag.medium-priority {
-    background: linear-gradient(45deg, #ffa502, #ff9500);
+    background: #2a2a1a;
+    border-color: #8b8b00;
+    color: #ffa502;
 }
 
 .tag.low-priority {
-    background: linear-gradient(45deg, #ffd93d, #ffc107);
-    color: #333;
+    background: #1a2a1a;
+    border-color: #008b00;
+    color: #ffd93d;
 }
 
 .tag.urgent {
-    background: linear-gradient(45deg, #ff6b6b, #ff5252);
+    background: #2a1a1a;
+    border-color: #8b0000;
+    color: #ff6b6b;
 }
 
 .tag.version {
-    background: linear-gradient(45deg, #ff9ff3, #ff6bcb);
+    background: #1a1a2a;
+    border-color: #00008b;
+    color: #ff9ff3;
 }
 
 .tag.work {
-    background: linear-gradient(45deg, #54a0ff, #4834d4);
+    background: #1a2a2a;
+    border-color: #0066cc;
+    color: #54a0ff;
 }
 
 .tag.personal {
-    background: linear-gradient(45deg, #5f27cd, #341f97);
+    background: #2a1a2a;
+    border-color: #660099;
+    color: #5f27cd;
 }
 
 /* 进展描述样式 */
@@ -293,13 +304,11 @@ select:focus {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 .modal-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    background: #1a1a1a;
     margin: 5% auto;
     padding: 30px;
     border-radius: 15px;
@@ -307,11 +316,11 @@ select:focus {
     max-width: 650px;
     max-height: 85vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid #333;
 }
 
 .close {
-    color: #aaa;
+    color: #888;
     float: right;
     font-size: 32px;
     font-weight: bold;
@@ -331,23 +340,24 @@ label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #e0e0e0;
 }
 
 input, textarea, select {
     width: 100%;
     padding: 12px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #333;
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.3s;
-    background: white;
+    background: #2a2a2a;
+    color: #e0e0e0;
 }
 
 input:focus, textarea:focus, select:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
 textarea {
@@ -563,16 +573,15 @@ textarea {
 
 /* 筛选区域样式 */
 .filter-section {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+    background: #1a1a1a;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    border: 1px solid #333;
 }
 
 .filter-section h3 {
-    color: #2c3e50;
+    color: #e0e0e0;
     margin-bottom: 15px;
 }
 
@@ -591,16 +600,18 @@ textarea {
 
 .filter-group label {
     font-weight: 500;
-    color: #2c3e50;
+    color: #e0e0e0;
     font-size: 14px;
 }
 
 .filter-group select {
     padding: 8px;
-    border: 2px solid #e0e0e0;
+    border: 2px solid #333;
     border-radius: 6px;
     font-size: 13px;
     min-width: 120px;
+    background: #2a2a2a;
+    color: #e0e0e0;
 }
 
 /* 每日总结样式 */
@@ -673,6 +684,260 @@ textarea {
 }
 
 /* 响应式设计 */
+/* 四象限视图样式 */
+.quadrant-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 20px;
+    height: calc(100vh - 200px);
+}
+
+/* 看板视图样式 */
+.board-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    height: calc(100vh - 200px);
+}
+
+.board-column {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.board-column h3 {
+    color: #e0e0e0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.board-column-items {
+    display: grid;
+    gap: 10px;
+}
+
+/* 时间线视图样式 */
+.timeline-container {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    border-left: 2px solid #4a90e2;
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+
+.timeline-date {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.timeline-content {
+    color: #e0e0e0;
+    font-size: 14px;
+}
+
+/* 附件样式 */
+.attachments-section {
+    margin: 15px 0;
+    padding: 15px;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 8px;
+}
+
+.attachments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.attachment-item {
+    position: relative;
+}
+
+.attachment-preview {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #444;
+}
+
+.attachment-item button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 2px 6px;
+    font-size: 10px;
+    background: #e74c3c;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+/* 图片预览样式 */
+.attachment-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.attachment-preview-item {
+    position: relative;
+    border: 1px solid #333;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.attachment-preview-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+}
+
+.attachment-preview-item button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 2px 6px;
+    font-size: 10px;
+    background: #e74c3c;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* 清单选择器 */
+.list-selector-section {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #333;
+}
+
+.list-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.list-selector select {
+    padding: 8px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: #e0e0e0;
+    min-width: 150px;
+}
+
+.list-selector button {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+
+/* 搜索框 */
+.search-section {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #333;
+}
+
+.search-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.search-controls input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+/* 重复规则选择器 */
+.repeat-rule-selector {
+    margin: 10px 0;
+}
+
+.repeat-rule-selector select {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #333;
+    border-radius: 6px;
+    background: #2a2a2a;
+    color: #e0e0e0;
+}
+
+.quadrant {
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 20px;
+    overflow-y: auto;
+    background: #1a1a1a;
+}
+
+.quadrant-1 {
+    border-color: #8b0000; /* 重要且紧急 - 深红色 */
+}
+
+.quadrant-2 {
+    border-color: #00008b; /* 重要不紧急 - 深蓝色 */
+}
+
+.quadrant-3 {
+    border-color: #8b4500; /* 紧急不重要 - 深橙色 */
+}
+
+.quadrant-4 {
+    border-color: #444; /* 不重要不紧急 - 深灰色 */
+}
+
+.quadrant h3 {
+    color: #e0e0e0;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.quadrant p {
+    color: #888;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.quadrant-items {
+    display: grid;
+    gap: 10px;
+}
+
+/* 响应式设计 */
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -696,5 +961,12 @@ textarea {
     .modal-content {
         margin: 10% auto;
         padding: 20px;
+    }
+
+    .quadrant-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(4, 1fr);
+        height: auto;
+        min-height: 1000px;
     }
 }

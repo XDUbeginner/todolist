@@ -11,12 +11,26 @@
         <header>
             <h1>🎯 待办事项管理工具</h1>
             <div class="header-actions">
+                <div class="list-selector-section">
+                    <select id="listSelector" class="list-selector">
+                        <!-- 动态加载清单 -->
+                    </select>
+                    <button onclick="showListManager()">管理清单</button>
+                </div>
+                <div class="search-section">
+                    <div class="search-controls">
+                        <input type="text" id="searchInput" placeholder="搜索任务...">
+                    </div>
+                </div>
                 <button onclick="showAddModal()">➕ 添加事项</button>
                 <button onclick="showTagManager()">🏷️ 管理标签</button>
                 <button onclick="generateDailySummary()">📊 每日总结</button>
                 <select id="viewMode" onchange="changeViewMode()">
                     <option value="day">📅 今日视图</option>
                     <option value="week">📆 本周视图</option>
+                    <option value="quadrant">⚡ 四象限视图</option>
+                    <option value="board">📋 看板视图</option>
+                    <option value="timeline">📊 时间线视图</option>
                 </select>
             </div>
         </header>
@@ -134,6 +148,26 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="repeatRule">重复规则</label>
+                    <select id="repeatRule" class="repeat-rule-selector">
+                        <option value="">不重复</option>
+                        <option value="daily|1">每天</option>
+                        <option value="daily|7">每7天</option>
+                        <option value="weekly|1">每周</option>
+                        <option value="weekly|2">每2周</option>
+                        <option value="monthly|1">每月</option>
+                        <option value="monthly|3">每3个月</option>
+                        <option value="yearly|1">每年</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="attachments">图片附件</label>
+                    <input type="file" id="attachments" multiple accept="image/*">
+                    <div id="attachmentPreview" class="attachment-preview"></div>
+                </div>
+
+                <div class="form-group">
                     <label for="progressText">进展描述</label>
                     <textarea id="progressText" rows="2" placeholder="描述事项的当前进展..."></textarea>
                 </div>
@@ -141,6 +175,22 @@
                 <div class="form-group">
                     <label for="notes">备注</label>
                     <textarea id="notes" rows="3" placeholder="添加备注信息..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>重要程度</label>
+                    <select id="importance">
+                        <option value="false">○ 不重要</option>
+                        <option value="true">● 重要</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>紧急程度</label>
+                    <select id="urgency">
+                        <option value="false">○ 不紧急</option>
+                        <option value="true">● 紧急</option>
+                    </select>
                 </div>
 
                 <div class="form-group">
