@@ -9,7 +9,7 @@ export default defineConfig({
         emptyOutDir: true,
         rollupOptions: {
             input: {
-                main: 'public/index.html'
+                main: 'index.html'
             }
         }
     },
@@ -18,7 +18,10 @@ export default defineConfig({
     ],
     server: {
         port: 3000,
-        https: true
+        https: true,
+        fs: {
+            allow: ['..']
+        }
     },
     test: {
         environment: 'jsdom'

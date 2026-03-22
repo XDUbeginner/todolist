@@ -319,14 +319,15 @@ class TodoApp {
 const todoApp = new TodoApp();
 
 // 全局函数（保持HTML兼容性）
-function showAddModal() { todoApp.showAddModal(); }
-function closeModal() { todoApp.closeModal(); }
-function showTagManager() { todoApp.showTagManager(); }
-function closeTagModal() { todoApp.closeTagModal(); }
-function generateDailySummary() { todoApp.generateDailySummary(); }
-function changeViewMode() { todoApp.changeViewMode(); }
-function showListManager() { todoApp.showListManager(); }
-function closeListModal() { todoApp.closeListModal(); }
+window.showAddModal = () => todoApp.showAddModal();
+window.closeModal = () => todoApp.closeModal();
+window.showTagManager = () => todoApp.showTagManager();
+window.closeTagModal = () => todoApp.closeTagModal();
+window.generateDailySummary = () => todoApp.generateDailySummary();
+window.changeViewMode = () => todoApp.changeViewMode();
+window.showListManager = () => todoApp.showListManager();
+window.closeListModal = () => todoApp.closeListModal();
 
 // 全局变量（保持兼容性）
-const todoManager = todoApp.taskManager;
+window.todoManager = todoApp.taskManager;
+window.todoApp = todoApp; // 暴露整个应用实例用于调试
